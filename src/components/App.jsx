@@ -16,27 +16,28 @@ export class App extends Component {
     isLoader: false,
     error: false,
     showModal: false,
+    showBtn: false,
   };
 
   async componentDidUpdate(_, prevState) {
     const { query, page } = this.state;
-        if (!query) {
-          return;
-        }
     if (page !== prevState.page || query !== prevState.query) {
       try {
         this.setState({ isLoader: true, error: false });
         const data = await fetchImages(query, page);
-        this.setState({ images: data.hits });
-
         if (data.hits.length === 0) {
-          toast.error(
-            'Sorry, there are no images matching your search query. Please try again'
-          );
+        toast.error(
+        'Sorry, there are no images matching your search query. Please try again'
+          )
+          return;  
         }
-        if (page === Math.ceil(data.totalHits / 12)) {
-          toast.success('We are sorry, but you have reached the end of search results.')
-        }
+        this.setState(prevState => ({
+          images: [...prevState.images, ...data.hits],
+          showBtn: page < Math.ceil(data.totalHits / 12),
+        }));
+        // if (page === Math.ceil(data.totalHits / 12)) {
+        //   toast.success('We are sorry, but you have reached the end of search results.')
+        // }
       } catch (error) {
         this.setState({ error: true });
          toast.error('Oops... Something went wrong. Please try again')
@@ -99,9 +100,8 @@ export class App extends Component {
       showModal,
       page,
       tags,
+      showBtn
     } = this.state;
-    const loadMorePages = page < Math.ceil(images.totalHits / 12);
-    const lastPage = page === Math.ceil(images.totalHits / 12);
     return (
       <Layout>
         <SearchBar
@@ -113,7 +113,7 @@ export class App extends Component {
           toast.error('Sorry! Something went wrong. Please try again!')}
         {isLoader && <Loader />}
         {!error && (<ImageGallery images={images} onOpenModal={this.openModal} />)}
-        {images.length !== 0 && !loadMorePages && !lastPage && (
+        {showBtn && (
           <LoadMore onClick={this.onLoadMore} />
          )} 
         {showModal && (
