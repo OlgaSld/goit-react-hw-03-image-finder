@@ -7,7 +7,7 @@ export const SearchBar = ({ query, onHandlerRequest }) => {
          <SearchForm>
            <SearchFormButton type="submit">
              <SearchFormButtonLabel>
-               <HiSearch />
+               <HiSearch style={{ width: 20, height: 20 }} />
              </SearchFormButtonLabel>
            </SearchFormButton>
            <SearchFormInput
