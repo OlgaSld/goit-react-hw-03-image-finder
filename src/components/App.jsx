@@ -98,7 +98,6 @@ export class App extends Component {
       error,
       largeImageURL,
       showModal,
-      page,
       tags,
       showBtn
     } = this.state;
