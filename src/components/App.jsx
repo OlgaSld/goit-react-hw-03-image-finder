@@ -4,7 +4,7 @@ import { SearchBar } from './Searchbar/Searchbar';
 import { Layout } from './App_styled';
 import { fetchImages } from 'api';
 import { ImageGallery } from './ImageGallery/ImageGallery';
-import { BtnLoadMore } from './Button/Button_styled';
+import { LoadMore } from './Button/Button';
 import { Modal } from './Modal/Modal';
 import { Loader } from './Loader/Loader';
 
@@ -107,7 +107,7 @@ export class App extends Component {
         {loading && <Loader />}
         <ImageGallery images={images} onOpenModal={this.openModal} />
         {images.length !== 0 && !loadMorePages && (
-          <BtnLoadMore onClick={this.onLoadMore} />
+          <LoadMore onClick={this.onLoadMore} />
          )} 
         {showModal && (
           <Modal
