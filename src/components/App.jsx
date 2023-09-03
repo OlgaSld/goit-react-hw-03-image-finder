@@ -13,16 +13,19 @@ export class App extends Component {
     query: '',
     images: [],
     page: 1,
-    loading: false,
+    isLoader: false,
     error: false,
     showModal: false,
   };
 
-  async componentDidUpdate(prevProps, prevState) {
+  async componentDidUpdate(_, prevState) {
     const { query, page } = this.state;
+        if (!query) {
+          return;
+        }
     if (page !== prevState.page || query !== prevState.query) {
       try {
-        this.setState({ loading: true, error: false });
+        this.setState({ isLoader: true, error: false });
         const data = await fetchImages(query, page);
         this.setState({ images: data.hits });
 
@@ -31,10 +34,14 @@ export class App extends Component {
             'Sorry, there are no images matching your search query. Please try again'
           );
         }
+        if (page === Math.ceil(data.totalHits / 12)) {
+          toast.success('We are sorry, but you have reached the end of search results.')
+        }
       } catch (error) {
         this.setState({ error: true });
+         toast.error('Oops... Something went wrong. Please try again')
       } finally {
-        this.setState({ loading: false });
+        this.setState({ isLoader: false });
       }
     }
   }
@@ -45,12 +52,11 @@ export class App extends Component {
     if (!query) {
       return;
     }
-
     this.setState({
       query,
       images: [],
       page: 1,
-    });
+    })
   };
 
   onLoadMore = () => {
@@ -78,7 +84,7 @@ export class App extends Component {
       query: '',
       images: [],
       page: 1,
-      loading: false,
+      isLoader: false,
       error: false,
       showModal: false,
     });
@@ -87,7 +93,7 @@ export class App extends Component {
   render() {
     const {
       images,
-      loading,
+      isLoader,
       error,
       largeImageURL,
       showModal,
@@ -95,6 +101,7 @@ export class App extends Component {
       tags,
     } = this.state;
     const loadMorePages = page < Math.ceil(images.totalHits / 12);
+    const lastPage = page === Math.ceil(images.totalHits / 12);
     return (
       <Layout>
         <SearchBar
@@ -102,11 +109,11 @@ export class App extends Component {
           onReset={this.resetSearch}
         />
         {error &&
-          !loading &&
+          !isLoader &&
           toast.error('Sorry! Something went wrong. Please try again!')}
-        {loading && <Loader />}
-        <ImageGallery images={images} onOpenModal={this.openModal} />
-        {images.length !== 0 && !loadMorePages && (
+        {isLoader && <Loader />}
+        {!error && (<ImageGallery images={images} onOpenModal={this.openModal} />)}
+        {images.length !== 0 && !loadMorePages && !lastPage && (
           <LoadMore onClick={this.onLoadMore} />
          )} 
         {showModal && (
