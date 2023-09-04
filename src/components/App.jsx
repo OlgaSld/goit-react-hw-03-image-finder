@@ -35,9 +35,9 @@ export class App extends Component {
           images: [...prevState.images, ...data.hits],
           showBtn: page < Math.ceil(data.totalHits / 12),
         }));
-        // if (page === Math.ceil(data.totalHits / 12)) {
-        //   toast.success('We are sorry, but you have reached the end of search results.')
-        // }
+        if (page === Math.ceil(data.totalHits / 12)) {
+          toast.success('We are sorry, but you have reached the end of search results.')
+        }
       } catch (error) {
         this.setState({ error: true });
          toast.error('Oops... Something went wrong. Please try again')
@@ -47,13 +47,8 @@ export class App extends Component {
     }
   }
 
-  handlerRequest = (evt) => {
-    evt.preventDefault()
-    const query = evt.target.value.trim()
-    if (!query) {
-      return;
-    }
-    this.setState({
+  submitRequest = query => {
+     this.setState({
       query,
       images: [],
       page: 1,
@@ -104,7 +99,7 @@ export class App extends Component {
     return (
       <Layout>
         <SearchBar
-          onHandlerRequest={this.handlerRequest}
+          onSubmit={this.submitRequest}
           onReset={this.resetSearch}
         />
         {error &&
